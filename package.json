@@ -1,0 +1,36 @@
+{
+  "name": "protractor-istanbul-plugin",
+  "version": "1.0.0",
+  "description": "Protractor plugin that collects istanbul coverage results from a page and dumps them to coverage.json files (one per spec).",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "fs-extra": "^0.22.1"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.5",
+    "q": "^1.4.1",
+    "sinon": "^1.15.4",
+    "chai": "^3.0.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bennyhat/protractor-istanbul-plugin.git"
+  },
+  "keywords": [
+    "Protractor",
+    "Istanbul",
+    "Coverage"
+  ],
+  "author": "Ben Brewer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bennyhat/protractor-istanbul-plugin/issues"
+  },
+  "homepage": "https://github.com/bennyhat/protractor-istanbul-plugin#readme"
+}
