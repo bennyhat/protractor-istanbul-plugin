@@ -1,6 +1,6 @@
 {
   "name": "protractor-istanbul-plugin",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Protractor plugin that collects istanbul coverage results from a page and dumps them to coverage.json files (one per spec).",
   "main": "index.js",
   "directories": {
