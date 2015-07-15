@@ -114,6 +114,37 @@ describe('protractor-istanbul-plugin', function () {
                                 done();
                             });
                         });
+                        describe('and some things fail', function () {
+                            describe('like the script execution', function () {
+                                beforeEach(function (done) {
+                                    sinon.stub(subject.driver, 'executeScript').returns(Q.reject("some reason!"));
+                                    sinon.stub(subject.fs, 'outputJsonSync').returns(true);
+                                    var promised = subject.postTest();
+                                    promised.then(
+                                        function (output) {
+                                            result = output;
+                                            done();
+                                        },
+                                        function () {
+                                            done();
+                                        }
+                                    );
+                                });
+                                it('does not write the coverage data to a file by calling its fs, using the output path and using a uuid for the file name', function (done) {
+                                    sinon.assert.neverCalledWith(subject.fs.outputJsonSync);
+                                    done();
+                                });
+                                it('logs a failure message vaguely indicating that it was successful and where it stored things', function (done) {
+                                    sinon.assert.calledWithMatch(console.log, /failed.*?gather.*?coverage.*?whonko\.json/i);
+                                    done();
+                                });
+                                afterEach(function (done) {
+                                    subject.driver.executeScript.restore();
+                                    subject.fs.outputJsonSync.restore();
+                                    done();
+                                });
+                            });
+                        });
                         afterEach(function (done) {
                             uuid.v4.restore();
                             console.log.restore();

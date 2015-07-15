@@ -43,6 +43,10 @@ function ProtractorIstanbulPlugin(options) {
                 instance.fs.outputJsonSync(outputFilePath);
                 console.log('successfully gathered coverage for test and stored in ' + outputFilePath);
                 deferred.resolve(coverageObject);
+            },
+            function (error) {
+                console.log('failed to gather coverage for test and store in ' + outputFilePath);
+                deferred.reject(error);
             }
         );
 
