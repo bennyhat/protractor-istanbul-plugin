@@ -6,15 +6,46 @@ var path = require('path');
 
 var ArgumentError = require('./lib/error').ArgumentError;
 
-var defaultOptions = {
-    outputPath: "coverage",
-    functions: []
-};
+var protractorIstanbulPluginInstance = new ProtractorIstanbulPlugin();
+module.exports = protractorIstanbulPluginInstance;
 
-module.exports = ProtractorIstanbulPlugin;
-
-function ProtractorIstanbulPlugin(options) {
+function ProtractorIstanbulPlugin() {
     var instance = this;
+    instance.options = {
+        outputPath: "coverage",
+        functions: []
+    };
+
+    instance.setup = function (options) {
+        instance.options = merge(instance.options, options);
+
+        // TODO - this is pretty jank
+        instance.driver = undefined;
+        instance.fs = fse;
+        try {
+            instance.driver = browser.driver;
+        }
+        catch (error) {}
+
+        if (typeof instance.options.outputPath !== 'string') throw new ArgumentError("");
+        if (!(instance.options.functions instanceof Array)) throw new ArgumentError("");
+        instance.options.functions.forEach(function (boundFunction) {
+            if (!(boundFunction instanceof Function)) throw new ArgumentError("");
+            if (!boundFunction.boundParent) throw new ArgumentError("");
+            if (!boundFunction.boundName) throw new ArgumentError("");
+        });
+
+        instance.options.functions.forEach(function (boundFunction) {
+            function Proxy() {
+                this.originalFunction = boundFunction;
+                var f = instance.preserveCoverage;
+                f.__proto__ = this;
+                return f;
+            }
+
+            boundFunction.boundParent[boundFunction.boundName] = new Proxy();
+        });
+    };
     instance.preserveCoverage = function () {
         var originalFunction = arguments.callee.originalFunction;
         var originalArguments = arguments;
@@ -76,33 +107,6 @@ function ProtractorIstanbulPlugin(options) {
         return deferred.promise;
     };
     instance.teardown = function () {
-
+        return Q.resolve('no sweat');
     };
-    // TODO - this is pretty jank
-    instance.driver = undefined;
-    instance.fs = fse;
-    try {
-        instance.driver = driver;
-    }
-    catch (error) {}
-    instance.options = merge(defaultOptions, options);
-
-    if (typeof instance.options.outputPath !== 'string') throw new ArgumentError("");
-    if (!(instance.options.functions instanceof Array)) throw new ArgumentError("");
-    instance.options.functions.forEach(function (boundFunction) {
-        if (!(boundFunction instanceof Function)) throw new ArgumentError("");
-        if (!boundFunction.boundParent) throw new ArgumentError("");
-        if (!boundFunction.boundName) throw new ArgumentError("");
-    });
-
-    instance.options.functions.forEach(function (boundFunction) {
-        function Proxy() {
-            this.originalFunction = boundFunction;
-            var f = instance.preserveCoverage;
-            f.__proto__ = this;
-            return f;
-        }
-
-        boundFunction.boundParent[boundFunction.boundName] = new Proxy();
-    });
 }

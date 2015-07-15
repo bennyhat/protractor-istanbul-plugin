@@ -6,7 +6,7 @@ var path = require('path');
 var uuid = require('uuid');
 
 require('./utilities');
-var ProtractorIstanbulPlugin = require('../index');
+var subjectPath = '../index';
 var subject;
 var result;
 
@@ -18,12 +18,16 @@ expectedWrappedFunction.boundParent = expectedWrappedObject;
 expectedWrappedFunction.boundName = "expectedWrappedFunction";
 
 describe('protractor-istanbul-plugin', function () {
-    describe('#constructor', function () {
+    beforeEach(function (done) {
+        subject = require(subjectPath);
+        done();
+    });
+    describe('#setup', function () {
         describe('with valid options', function () {
             describe('with all options provided', function () {
                 beforeEach(function (done) {
                     sinon.spy(expectedWrappedObject, 'expectedWrappedFunction');
-                    subject = new ProtractorIstanbulPlugin({
+                    subject.setup({
                         outputPath: "some/path",
                         functions: [expectedWrappedObject.expectedWrappedFunction]
                     });
@@ -288,7 +292,7 @@ describe('protractor-istanbul-plugin', function () {
             describe('with invalid outputPath option', function () {
                 it('throws an exception stating that outputPath is invalid', function (done) {
                     chai.expect(function () {
-                        subject = new ProtractorIstanbulPlugin({outputPath: undefined});
+                        subject.setup({outputPath: undefined});
                     }).to.throw('ArgumentError');
                     done();
                 })
@@ -297,7 +301,7 @@ describe('protractor-istanbul-plugin', function () {
                 describe('with functions option that is not an array', function () {
                     it('throws an exception stating that functions is/are invalid', function (done) {
                         chai.expect(function () {
-                            subject = new ProtractorIstanbulPlugin({functions: undefined});
+                            subject.setup({functions: undefined});
                         }).to.throw('ArgumentError');
                         done();
                     })
@@ -305,7 +309,7 @@ describe('protractor-istanbul-plugin', function () {
                 describe('with functions option that is not an array of functions', function () {
                     it('throws an exception stating that functions is/are invalid', function (done) {
                         chai.expect(function () {
-                            subject = new ProtractorIstanbulPlugin({functions: [undefined]});
+                            subject.setup({functions: [undefined]});
                         }).to.throw('ArgumentError');
                         done();
                     })
@@ -316,7 +320,7 @@ describe('protractor-istanbul-plugin', function () {
                         };
                         badFunction.boundName = "whatever";
                         chai.expect(function () {
-                            subject = new ProtractorIstanbulPlugin({functions: [badFunction]});
+                            subject.setup({functions: [badFunction]});
                         }).to.throw('ArgumentError');
                         done();
                     })
@@ -327,12 +331,16 @@ describe('protractor-istanbul-plugin', function () {
                         };
                         badFunction.boundParent = {};
                         chai.expect(function () {
-                            subject = new ProtractorIstanbulPlugin({functions: [badFunction]});
+                            subject.setup({functions: [badFunction]});
                         }).to.throw('ArgumentError');
                         done();
                     })
                 });
             });
         });
+    });
+    afterEach(function (done) {
+        delete require.cache[require.resolve(subjectPath)];
+        done();
     });
 });
