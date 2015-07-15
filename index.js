@@ -25,7 +25,8 @@ function ProtractorIstanbulPlugin() {
         try {
             instance.driver = browser.driver;
         }
-        catch (error) {}
+        catch (error) {
+        }
 
         if (typeof instance.options.outputPath !== 'string') throw new ArgumentError("");
         if (!(instance.options.functions instanceof Array)) throw new ArgumentError("");
@@ -52,13 +53,19 @@ function ProtractorIstanbulPlugin() {
         var originalReturn = undefined;
         var deferred = Q.defer();
 
-        var successMessage = 'successfully preserved coverage during wrapped function call';
-        var failureMessage = 'failed to preserve coverage during wrapped function call';
+        var successMessage = 'Successfully preserved coverage during wrapped function call';
+        var failureMessage = 'Failed to preserve coverage during wrapped function call';
 
         instance.driver.executeScript('return __coverage__;')
             .then(
             function (coverageObject) {
-                originalReturn = originalFunction.apply(this, originalArguments);
+                try {
+                    originalReturn = originalFunction.apply(this, originalArguments);
+                }
+                catch (error) {
+                    console.log(failureMessage);
+                    deferred.resolve(originalReturn);
+                }
                 instance.driver.executeScript('__coverage__ = arguments[0];', coverageObject).then(
                     function () {
                         console.log(successMessage);
@@ -74,10 +81,6 @@ function ProtractorIstanbulPlugin() {
                 console.log(failureMessage);
                 originalReturn = originalFunction.apply(this, originalArguments);
                 deferred.resolve(originalReturn);
-            })
-            .catch(function (error) {
-                console.log(failureMessage);
-                deferred.reject(error);
             });
         return deferred.promise;
     };
@@ -85,21 +88,23 @@ function ProtractorIstanbulPlugin() {
     instance.postTest = function () {
         var deferred = Q.defer();
         var outputFilePath = path.join(instance.options.outputPath, uuid.v4() + '.json');
-        var successMessage = 'successfully gathered coverage for test and stored in ' + outputFilePath;
-        var failureMessage = 'failed to gather coverage for test and store in ' + outputFilePath;
+        var successMessage = 'Successfully gathered coverage for test and stored in ' + outputFilePath;
+        var failureMessage = 'Failed to gather coverage for test and store in ' + outputFilePath;
 
         instance.driver.executeScript('return __coverage__;')
             .then(
             function (coverageObject) {
-                instance.fs.outputJsonSync(outputFilePath, coverageObject);
+                try {
+                    instance.fs.outputJsonSync(outputFilePath, coverageObject);
+                }
+                catch (error) {
+                    console.log(failureMessage);
+                    deferred.resolve();
+                }
                 console.log(successMessage);
                 deferred.resolve(coverageObject);
             },
             function (error) {
-                console.log(failureMessage);
-                deferred.reject(error);
-            })
-            .catch(function (error) {
                 console.log(failureMessage);
                 deferred.reject(error);
             });

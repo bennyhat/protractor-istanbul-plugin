@@ -1,7 +1,7 @@
 var assert = require('assert');
 var chai = require('chai');
 var sinon = require('sinon');
-var Q = require('q');
+var webdriver = require('selenium-webdriver');
 var path = require('path');
 var uuid = require('uuid');
 
@@ -59,7 +59,7 @@ describe('protractor-istanbul-plugin', function () {
                         describe('and everything goes as planned', function () {
                             beforeEach(function (done) {
                                 result = undefined;
-                                sinon.stub(subject.driver, 'executeScript').returns(Q.resolve({coverage: 'object'}));
+                                sinon.stub(subject.driver, 'executeScript').returns(webdriver.promise.fulfilled({coverage: 'object'}));
                                 var promised = expectedWrappedObject.expectedWrappedFunction('first arg', 'second arg');
                                 promised.then(function (output) {
                                     result = output;
@@ -83,7 +83,7 @@ describe('protractor-istanbul-plugin', function () {
                                 done();
                             });
                             it('logs a success message vaguely indicating that it was successful and where it stored things', function (done) {
-                                sinon.assert.calledWithMatch(console.log, /successfully.*?preserved.*?coverage/i);
+                                sinon.assert.calledWithMatch(console.log, /Successfully.*?preserved.*?coverage/);
                                 done();
                             });
                             afterEach(function (done) {
@@ -95,7 +95,7 @@ describe('protractor-istanbul-plugin', function () {
                             describe('like the task of getting the coverage', function () {
                                 beforeEach(function (done) {
                                     result = undefined;
-                                    sinon.stub(subject.driver, 'executeScript').onFirstCall().returns(Q.reject(new Error("error")));
+                                    sinon.stub(subject.driver, 'executeScript').onFirstCall().returns(webdriver.promise.rejected(new Error("error")));
                                     var promised = expectedWrappedObject.expectedWrappedFunction('first arg', 'second arg');
                                     promised.then(function (output) {
                                         result = output;
@@ -111,7 +111,7 @@ describe('protractor-istanbul-plugin', function () {
                                     done();
                                 });
                                 it('logs a failure message vaguely indicating that it failed to preserve coverage', function (done) {
-                                    sinon.assert.calledWithMatch(console.log, /failed.*?preserve.*?coverage/i);
+                                    sinon.assert.calledWithMatch(console.log, /Failed.*?preserve.*?coverage/);
                                     done();
                                 });
                                 afterEach(function (done) {
@@ -122,7 +122,7 @@ describe('protractor-istanbul-plugin', function () {
                             describe('like the execution of the wrapped function', function () {
                                 beforeEach(function (done) {
                                     result = undefined;
-                                    sinon.stub(subject.driver, 'executeScript').returns(Q.resolve({coverage: 'object'}));
+                                    sinon.stub(subject.driver, 'executeScript').returns(webdriver.promise.fulfilled({coverage: 'object'}));
                                     expectedWrappedObject.expectedWrappedFunction.originalFunction = expectedWrappedFunction;
                                     sinon.stub(expectedWrappedObject.expectedWrappedFunction, 'originalFunction').throws(new Error("error"));
                                     var promised = expectedWrappedObject.expectedWrappedFunction('first arg', 'second arg');
@@ -137,7 +137,7 @@ describe('protractor-istanbul-plugin', function () {
                                     );
                                 });
                                 it('logs a failure message vaguely indicating that it failed to preserve coverage', function (done) {
-                                    sinon.assert.calledWithMatch(console.log, /failed.*?preserve.*?coverage/i);
+                                    sinon.assert.calledWithMatch(console.log, /Failed.*?preserve.*?coverage/);
                                     done();
                                 });
                                 afterEach(function (done) {
@@ -149,8 +149,8 @@ describe('protractor-istanbul-plugin', function () {
                             describe('like the task of setting the coverage', function () {
                                 beforeEach(function (done) {
                                     result = undefined;
-                                    sinon.stub(subject.driver, 'executeScript').onFirstCall().returns(Q.resolve({coverage: 'object'}));
-                                    subject.driver.executeScript.onSecondCall().returns(Q.reject(new Error('error')));
+                                    sinon.stub(subject.driver, 'executeScript').onFirstCall().returns(webdriver.promise.fulfilled({coverage: 'object'}));
+                                    subject.driver.executeScript.onSecondCall().returns(webdriver.promise.rejected(new Error('error')));
                                     var promised = expectedWrappedObject.expectedWrappedFunction('first arg', 'second arg');
                                     promised.then(function (output) {
                                         result = output;
@@ -166,7 +166,7 @@ describe('protractor-istanbul-plugin', function () {
                                     done();
                                 });
                                 it('logs a failure message vaguely indicating that it failed to preserve coverage', function (done) {
-                                    sinon.assert.calledWithMatch(console.log, /failed.*?preserve.*?coverage/i);
+                                    sinon.assert.calledWithMatch(console.log, /Failed.*?preserve.*?coverage/);
                                     done();
                                 });
                                 afterEach(function (done) {
@@ -190,7 +190,7 @@ describe('protractor-istanbul-plugin', function () {
                         });
                         describe('and everything goes as planned', function () {
                             beforeEach(function (done) {
-                                sinon.stub(subject.driver, 'executeScript').returns(Q.resolve({coverage: 'object'}));
+                                sinon.stub(subject.driver, 'executeScript').returns(webdriver.promise.fulfilled({coverage: 'object'}));
                                 sinon.stub(subject.fs, 'outputJsonSync').returns(true);
                                 var promised = subject.postTest();
                                 promised.then(function (output) {
@@ -208,7 +208,7 @@ describe('protractor-istanbul-plugin', function () {
                                 done();
                             });
                             it('logs a success message vaguely indicating that it was successful and where it stored things', function (done) {
-                                sinon.assert.calledWithMatch(console.log, /successfully.*?gathered.*?coverage.*?whonko\.json/i);
+                                sinon.assert.calledWithMatch(console.log, /Successfully.*?gathered.*?coverage.*?whonko\.json/);
                                 done();
                             });
                             afterEach(function (done) {
@@ -220,7 +220,7 @@ describe('protractor-istanbul-plugin', function () {
                         describe('and some things fail', function () {
                             describe('like the script execution', function () {
                                 beforeEach(function (done) {
-                                    sinon.stub(subject.driver, 'executeScript').returns(Q.reject("some reason!"));
+                                    sinon.stub(subject.driver, 'executeScript').returns(webdriver.promise.rejected("some reason!"));
                                     sinon.stub(subject.fs, 'outputJsonSync').returns(true);
                                     var promised = subject.postTest();
                                     promised.then(
@@ -238,7 +238,7 @@ describe('protractor-istanbul-plugin', function () {
                                     done();
                                 });
                                 it('logs a failure message vaguely indicating that it was failed and where it tried to store things', function (done) {
-                                    sinon.assert.calledWithMatch(console.log, /failed.*?gather.*?coverage.*?whonko\.json/i);
+                                    sinon.assert.calledWithMatch(console.log, /Failed.*?gather.*?coverage.*?whonko\.json/);
                                     done();
                                 });
                                 afterEach(function (done) {
@@ -249,7 +249,7 @@ describe('protractor-istanbul-plugin', function () {
                             });
                             describe('like the file writing', function () {
                                 beforeEach(function (done) {
-                                    sinon.stub(subject.driver, 'executeScript').returns(Q.resolve({coverage: 'object'}));
+                                    sinon.stub(subject.driver, 'executeScript').returns(webdriver.promise.fulfilled({coverage: 'object'}));
                                     sinon.stub(subject.fs, 'outputJsonSync').throws(new Error("error"));
                                     var promised = subject.postTest();
                                     promised.then(
@@ -263,7 +263,7 @@ describe('protractor-istanbul-plugin', function () {
                                     );
                                 });
                                 it('logs a failure message vaguely indicating that it was failed and where it tried to store things', function (done) {
-                                    sinon.assert.calledWithMatch(console.log, /failed.*?gather.*?coverage.*?whonko\.json/i);
+                                    sinon.assert.calledWithMatch(console.log, /Failed.*?gather.*?coverage.*?whonko\.json/);
                                     done();
                                 });
                                 afterEach(function (done) {
