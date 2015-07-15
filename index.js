@@ -106,7 +106,7 @@ function ProtractorIstanbulPlugin() {
             },
             function (error) {
                 console.log(failureMessage);
-                deferred.reject(error);
+                deferred.resolve(error);
             });
 
         return deferred.promise;

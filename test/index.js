@@ -100,7 +100,7 @@ describe('protractor-istanbul-plugin', function () {
                                     promised.then(function (output) {
                                         result = output;
                                         done();
-                                    });
+                                    }); // a lack of reject path here implies (unfortunately) that this should NOT reject
                                 });
                                 it('calls the wrapped function with those arguments', function (done) {
                                     sinon.assert.calledWithMatch(expectedWrappedObject.expectedWrappedFunction.originalFunction, 'first arg', 'second arg');
@@ -130,11 +130,8 @@ describe('protractor-istanbul-plugin', function () {
                                         function (output) {
                                             result = output;
                                             done();
-                                        },
-                                        function () {
-                                            done();
                                         }
-                                    );
+                                    ); // a lack of reject path here implies (unfortunately) that this should NOT reject
                                 });
                                 it('logs a failure message vaguely indicating that it failed to preserve coverage', function (done) {
                                     sinon.assert.calledWithMatch(console.log, /Failed.*?preserve.*?coverage/);
@@ -155,7 +152,7 @@ describe('protractor-istanbul-plugin', function () {
                                     promised.then(function (output) {
                                         result = output;
                                         done();
-                                    });
+                                    }); // a lack of reject path here implies (unfortunately) that this should NOT reject
                                 });
                                 it('calls the wrapped function with those arguments', function (done) {
                                     sinon.assert.calledWithMatch(expectedWrappedObject.expectedWrappedFunction.originalFunction, 'first arg', 'second arg');
@@ -227,11 +224,8 @@ describe('protractor-istanbul-plugin', function () {
                                         function (output) {
                                             result = output;
                                             done();
-                                        },
-                                        function () {
-                                            done();
                                         }
-                                    );
+                                    ); // a lack of reject path here implies (unfortunately) that this should NOT reject
                                 });
                                 it('does not write the coverage data to a file by calling its fs, using the output path and using a uuid for the file name', function (done) {
                                     sinon.assert.neverCalledWith(subject.fs.outputJsonSync);
@@ -256,11 +250,8 @@ describe('protractor-istanbul-plugin', function () {
                                         function (output) {
                                             result = output;
                                             done();
-                                        },
-                                        function () {
-                                            done();
                                         }
-                                    );
+                                    ); // a lack of reject path here implies (unfortunately) that this should NOT reject
                                 });
                                 it('logs a failure message vaguely indicating that it was failed and where it tried to store things', function (done) {
                                     sinon.assert.calledWithMatch(console.log, /Failed.*?gather.*?coverage.*?whonko\.json/);
