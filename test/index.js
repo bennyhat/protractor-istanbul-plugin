@@ -5,6 +5,7 @@ var Q = require('q');
 var path = require('path');
 var uuid = require('uuid');
 
+require('./utilities');
 var ProtractorIstanbulPlugin = require('../index');
 var subject;
 var result;
