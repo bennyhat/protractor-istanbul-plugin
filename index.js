@@ -91,7 +91,7 @@ function ProtractorIstanbulPlugin() {
         instance.driver.executeScript('return __coverage__;')
             .then(
             function (coverageObject) {
-                instance.fs.outputJsonSync(outputFilePath);
+                instance.fs.outputJsonSync(outputFilePath, coverageObject);
                 console.log(successMessage);
                 deferred.resolve(coverageObject);
             },

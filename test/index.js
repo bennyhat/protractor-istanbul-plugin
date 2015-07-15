@@ -204,7 +204,7 @@ describe('protractor-istanbul-plugin', function () {
                             });
                             it('writes the coverage data to a file by calling its fs, using the output path and using a uuid for the file name', function (done) {
                                 var expectedPath = path.join("some/path", 'whonko.json');
-                                sinon.assert.calledWith(subject.fs.outputJsonSync, expectedPath);
+                                sinon.assert.calledWith(subject.fs.outputJsonSync, expectedPath, {coverage: 'object'});
                                 done();
                             });
                             it('logs a success message vaguely indicating that it was successful and where it stored things', function (done) {
