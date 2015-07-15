@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "fs-extra": "^0.22.1",
-    "merge": "^1.2.0"
+    "merge": "^1.2.0",
+    "uuid": "^2.0.1"
   },
   "devDependencies": {
     "mocha": "^2.2.5",

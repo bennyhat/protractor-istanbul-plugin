@@ -1,7 +1,15 @@
 var merge = require('merge');
 var Q = require('q');
+var fse = require('fs-extra');
+var uuid = require('uuid');
+var path = require('path');
 
 var ArgumentError = require('./lib/error').ArgumentError;
+
+var defaultOptions = {
+    outputPath: "coverage",
+    functions: []
+};
 
 module.exports = ProtractorIstanbulPlugin;
 
@@ -10,15 +18,15 @@ function ProtractorIstanbulPlugin(options) {
     instance.preserveCoverage = function () {
         var originalFunction = arguments.callee.originalFunction;
         var originalArguments = arguments;
+        var originalReturn = undefined;
         var deferred = Q.defer();
 
         instance.driver.executeScript('return __coverage__;').then(
             function (coverageObject) {
-                var childDeferred = Q.defer();
-                originalFunction.apply(this, originalArguments);
+                originalReturn = originalFunction.apply(this, originalArguments);
                 instance.driver.executeScript('__coverage__ = arguments[0];', coverageObject).then(
                     function () {
-                        deferred.resolve('whatever');
+                        deferred.resolve(originalReturn);
                     }
                 );
             }
@@ -27,34 +35,40 @@ function ProtractorIstanbulPlugin(options) {
     };
 
     instance.postTest = function () {
+        var deferred = Q.defer();
+        var outputFilePath = path.join(instance.options.outputPath, uuid.v4() + '.json');
 
+        instance.driver.executeScript('return __coverage__;').then(
+            function (coverageObject) {
+                instance.fs.outputJsonSync(outputFilePath);
+                console.log('successfully gathered coverage for test and stored in ' + outputFilePath);
+                deferred.resolve(coverageObject);
+            }
+        );
+
+        return deferred.promise;
     };
     instance.teardown = function () {
 
     };
     // TODO - this is pretty jank
+    instance.driver = undefined;
+    instance.fs = fse;
     try {
         instance.driver = driver;
     }
-    catch (error) {
-        instance.driver = undefined;
-    }
-    var defaultOptions = {
-        outputPath: ".",
-        functions: []
-    };
+    catch (error) {}
+    instance.options = merge(defaultOptions, options);
 
-    options = merge(defaultOptions, options);
-
-    if (typeof options.outputPath !== 'string') throw new ArgumentError("");
-    if (!(options.functions instanceof Array)) throw new ArgumentError("");
-    options.functions.forEach(function (boundFunction) {
+    if (typeof instance.options.outputPath !== 'string') throw new ArgumentError("");
+    if (!(instance.options.functions instanceof Array)) throw new ArgumentError("");
+    instance.options.functions.forEach(function (boundFunction) {
         if (!(boundFunction instanceof Function)) throw new ArgumentError("");
         if (!boundFunction.boundParent) throw new ArgumentError("");
         if (!boundFunction.boundName) throw new ArgumentError("");
     });
 
-    options.functions.forEach(function (boundFunction) {
+    instance.options.functions.forEach(function (boundFunction) {
         function Proxy() {
             this.originalFunction = boundFunction;
             var f = instance.preserveCoverage;

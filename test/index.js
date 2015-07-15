@@ -2,11 +2,15 @@ var assert = require('assert');
 var chai = require('chai');
 var sinon = require('sinon');
 var Q = require('q');
+var path = require('path');
+var uuid = require('uuid');
 
 var ProtractorIstanbulPlugin = require('../index');
 var subject;
+var result;
 
 var expectedWrappedFunction = function () {
+    return 'expected-result';
 };
 var expectedWrappedObject = {expectedWrappedFunction: expectedWrappedFunction};
 expectedWrappedFunction.boundParent = expectedWrappedObject;
@@ -44,13 +48,15 @@ describe('protractor-istanbul-plugin', function () {
                 describe('#preserveCoverage', function () {
                     describe('when wrapped function called with any number of arguments', function () {
                         beforeEach(function (done) {
+                            result = undefined;
                             sinon.stub(subject.driver, 'executeScript').returns(Q.resolve({coverage: 'object'}));
                             var promised = expectedWrappedObject.expectedWrappedFunction('first arg', 'second arg');
-                            promised.then(function () {
+                            promised.then(function (output) {
+                                result = output;
                                 done();
                             });
                         });
-                        it('preserves coverage by getting it from the page', function (done) {
+                        it('preserves coverage by getting it from the page with its driver', function (done) {
                             sinon.assert.calledWith(subject.driver.executeScript, 'return __coverage__;');
                             done();
                         });
@@ -58,12 +64,59 @@ describe('protractor-istanbul-plugin', function () {
                             sinon.assert.calledWithMatch(expectedWrappedObject.expectedWrappedFunction.originalFunction, 'first arg', 'second arg');
                             done();
                         });
-                        it('preserves coverage by setting it back to the page', function (done) {
+                        it('returns (via promise) whatever the wrapped function would have returned', function (done) {
+                            assert.equal(result, 'expected-result');
+                            done();
+                        });
+                        it('preserves coverage by setting it back to the page with its driver', function (done) {
                             sinon.assert.calledWith(subject.driver.executeScript, '__coverage__ = arguments[0];', {coverage: 'object'});
                             done();
                         });
                         afterEach(function (done) {
                             subject.driver.executeScript.restore();
+                            done();
+                        });
+                    });
+                });
+                describe('#postTest', function () {
+                    describe('when called as part of a protractor run', function () {
+                        beforeEach(function (done) {
+                            sinon.stub(uuid, 'v4').returns('whonko');
+                            sinon.stub(console, 'log');
+                            done();
+                        });
+                        describe('and everything goes as planned', function () {
+                            beforeEach(function (done) {
+                                sinon.stub(subject.driver, 'executeScript').returns(Q.resolve({coverage: 'object'}));
+                                sinon.stub(subject.fs, 'outputJsonSync').returns(true);
+                                var promised = subject.postTest();
+                                promised.then(function (output) {
+                                    result = output;
+                                    done();
+                                });
+                            });
+                            it('collects the coverage data from the page by calling its driver', function (done) {
+                                sinon.assert.calledWith(subject.driver.executeScript, 'return __coverage__;');
+                                done();
+                            });
+                            it('writes the coverage data to a file by calling its fs, using the output path and using a uuid for the file name', function (done) {
+                                var expectedPath = path.join("some/path", 'whonko.json');
+                                sinon.assert.calledWith(subject.fs.outputJsonSync, expectedPath);
+                                done();
+                            });
+                            it('logs a success message vaguely indicating that it was successful and where it stored things', function (done) {
+                                sinon.assert.calledWithMatch(console.log, /successfully.*?gathered.*?coverage.*?whonko\.json/i);
+                                done();
+                            });
+                            afterEach(function (done) {
+                                subject.driver.executeScript.restore();
+                                subject.fs.outputJsonSync.restore();
+                                done();
+                            });
+                        });
+                        afterEach(function (done) {
+                            uuid.v4.restore();
+                            console.log.restore();
                             done();
                         });
                     });
