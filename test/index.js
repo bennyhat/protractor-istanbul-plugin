@@ -142,7 +142,32 @@ describe('protractor-istanbul-plugin', function () {
                                 });
                             });
                             describe('like the task of setting the coverage', function () {
-
+                                beforeEach(function (done) {
+                                    result = undefined;
+                                    sinon.stub(subject.driver, 'executeScript').onFirstCall().returns(Q.resolve({coverage: 'object'}));
+                                    subject.driver.executeScript.onSecondCall().returns(Q.reject(new Error('error')));
+                                    var promised = expectedWrappedObject.expectedWrappedFunction('first arg', 'second arg');
+                                    promised.then(function (output) {
+                                        result = output;
+                                        done();
+                                    });
+                                });
+                                it('calls the wrapped function with those arguments', function (done) {
+                                    sinon.assert.calledWithMatch(expectedWrappedObject.expectedWrappedFunction.originalFunction, 'first arg', 'second arg');
+                                    done();
+                                });
+                                it('returns (via promise) whatever the wrapped function would have returned', function (done) {
+                                    assert.equal(result, 'expected-result');
+                                    done();
+                                });
+                                it('logs a failure message vaguely indicating that it failed to preserve coverage', function (done) {
+                                    sinon.assert.calledWithMatch(console.log, /failed.*?preserve.*?coverage/i);
+                                    done();
+                                });
+                                afterEach(function (done) {
+                                    subject.driver.executeScript.restore();
+                                    done();
+                                });
                             });
                         });
                         afterEach(function (done) {

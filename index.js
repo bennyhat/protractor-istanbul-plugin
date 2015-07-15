@@ -32,6 +32,10 @@ function ProtractorIstanbulPlugin(options) {
                     function () {
                         console.log(successMessage);
                         deferred.resolve(originalReturn);
+                    },
+                    function () {
+                        console.log(failureMessage);
+                        deferred.resolve(originalReturn);
                     }
                 );
             },
