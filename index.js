@@ -5,9 +5,10 @@ var uuid = require('uuid');
 var path = require('path');
 
 var ArgumentError = require('./lib/error').ArgumentError;
+var successfulPostTestOutput = {failedCount: 0, specResults: []};
+var failedPostTestOutput = {failedCount: 1, specResults: []};
 
-var protractorIstanbulPluginInstance = new ProtractorIstanbulPlugin();
-module.exports = protractorIstanbulPluginInstance;
+module.exports = new ProtractorIstanbulPlugin();
 
 function ProtractorIstanbulPlugin() {
     var instance = this;
@@ -99,19 +100,16 @@ function ProtractorIstanbulPlugin() {
                 }
                 catch (error) {
                     console.log(failureMessage);
-                    deferred.resolve();
+                    deferred.resolve(failedPostTestOutput);
                 }
                 console.log(successMessage);
-                deferred.resolve(coverageObject);
+                deferred.resolve(successfulPostTestOutput);
             },
             function (error) {
                 console.log(failureMessage);
-                deferred.resolve(error);
+                deferred.resolve(failedPostTestOutput);
             });
 
         return deferred.promise;
-    };
-    instance.teardown = function () {
-        return Q.resolve('no sweat');
     };
 }

@@ -22,6 +22,16 @@ describe('protractor-istanbul-plugin', function () {
         subject = require(subjectPath);
         done();
     });
+    describe('::plugin', function () {
+        it('should implement the setup plugin function', function (done) {
+            assert.equal(subject.setup instanceof Function, true);
+            done();
+        });
+        it('should implement the postTest plugin function', function (done) {
+            assert.equal(subject.postTest instanceof Function, true);
+            done();
+        });
+    });
     describe('#setup', function () {
         describe('with valid options', function () {
             describe('with all options provided', function () {
@@ -36,14 +46,6 @@ describe('protractor-istanbul-plugin', function () {
                         executeScript: function () {
                         }
                     };
-                    done();
-                });
-                it('should implement the postTest plugin function', function (done) {
-                    assert.equal(subject.postTest instanceof Function, true);
-                    done();
-                });
-                it('should implement the teardown plugin function', function (done) {
-                    assert.equal(subject.teardown instanceof Function, true);
                     done();
                 });
                 it('should wrap the provided functions(s) in its preserveCoverage method', function (done) {
@@ -208,6 +210,14 @@ describe('protractor-istanbul-plugin', function () {
                                 sinon.assert.calledWithMatch(console.log, /Successfully.*?gathered.*?coverage.*?whonko\.json/);
                                 done();
                             });
+                            it('returns a results object with 0 failed tests and no spec results', function (done) {
+                                assert.equal(typeof result == 'object', true);
+                                assert.equal(typeof result.failedCount == 'number', true);
+                                assert.equal(result.failedCount, 0);
+                                assert.equal(result.specResults instanceof Array, true);
+                                assert.deepEqual(result.specResults, []);
+                                done();
+                            });
                             afterEach(function (done) {
                                 subject.driver.executeScript.restore();
                                 subject.fs.outputJsonSync.restore();
@@ -235,6 +245,14 @@ describe('protractor-istanbul-plugin', function () {
                                     sinon.assert.calledWithMatch(console.log, /Failed.*?gather.*?coverage.*?whonko\.json/);
                                     done();
                                 });
+                                it('returns a results object with 1 failed test and no spec results', function (done) {
+                                    assert.equal(typeof result == 'object', true);
+                                    assert.equal(typeof result.failedCount == 'number', true);
+                                    assert.equal(result.failedCount, 1);
+                                    assert.equal(result.specResults instanceof Array, true);
+                                    assert.deepEqual(result.specResults, []);
+                                    done();
+                                });
                                 afterEach(function (done) {
                                     subject.driver.executeScript.restore();
                                     subject.fs.outputJsonSync.restore();
@@ -255,6 +273,14 @@ describe('protractor-istanbul-plugin', function () {
                                 });
                                 it('logs a failure message vaguely indicating that it was failed and where it tried to store things', function (done) {
                                     sinon.assert.calledWithMatch(console.log, /Failed.*?gather.*?coverage.*?whonko\.json/);
+                                    done();
+                                });
+                                it('returns a results object with 1 failed test and no spec results', function (done) {
+                                    assert.equal(typeof result == 'object', true);
+                                    assert.equal(typeof result.failedCount == 'number', true);
+                                    assert.equal(result.failedCount, 1);
+                                    assert.equal(result.specResults instanceof Array, true);
+                                    assert.deepEqual(result.specResults, []);
                                     done();
                                 });
                                 afterEach(function (done) {
