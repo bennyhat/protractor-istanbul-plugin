@@ -21,34 +21,53 @@ function ProtractorIstanbulPlugin(options) {
         var originalReturn = undefined;
         var deferred = Q.defer();
 
-        instance.driver.executeScript('return __coverage__;').then(
+        var successMessage = 'successfully preserved coverage during wrapped function call';
+        var failureMessage = 'failed to preserve coverage during wrapped function call';
+
+        instance.driver.executeScript('return __coverage__;')
+            .then(
             function (coverageObject) {
                 originalReturn = originalFunction.apply(this, originalArguments);
                 instance.driver.executeScript('__coverage__ = arguments[0];', coverageObject).then(
                     function () {
+                        console.log(successMessage);
                         deferred.resolve(originalReturn);
                     }
                 );
-            }
-        );
+            },
+            function () {
+                console.log(failureMessage);
+                originalReturn = originalFunction.apply(this, originalArguments);
+                deferred.resolve(originalReturn);
+            })
+            .catch(function (error) {
+                console.log(failureMessage);
+                deferred.reject(error);
+            });
         return deferred.promise;
     };
 
     instance.postTest = function () {
         var deferred = Q.defer();
         var outputFilePath = path.join(instance.options.outputPath, uuid.v4() + '.json');
+        var successMessage = 'successfully gathered coverage for test and stored in ' + outputFilePath;
+        var failureMessage = 'failed to gather coverage for test and store in ' + outputFilePath;
 
-        instance.driver.executeScript('return __coverage__;').then(
+        instance.driver.executeScript('return __coverage__;')
+            .then(
             function (coverageObject) {
                 instance.fs.outputJsonSync(outputFilePath);
-                console.log('successfully gathered coverage for test and stored in ' + outputFilePath);
+                console.log(successMessage);
                 deferred.resolve(coverageObject);
             },
             function (error) {
-                console.log('failed to gather coverage for test and store in ' + outputFilePath);
+                console.log(failureMessage);
                 deferred.reject(error);
-            }
-        );
+            })
+            .catch(function (error) {
+                console.log(failureMessage);
+                deferred.reject(error);
+            });
 
         return deferred.promise;
     };
