@@ -1,3 +1,6 @@
 language: node_js
 node_js:
   - "0.12"
+
+after_success:
+  mocha -R mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js

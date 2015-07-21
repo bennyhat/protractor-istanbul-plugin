@@ -15,13 +15,14 @@
   "devDependencies": {
     "blanket": "^1.1.7",
     "chai": "^3.0.0",
+    "coveralls": "^2.11.3",
     "mocha": "^2.2.5",
+    "mocha-lcov-reporter": "0.0.2",
     "selenium-webdriver": "^2.46.1",
-    "sinon": "^1.15.4",
-    "travis-cov": "^0.2.5"
+    "sinon": "^1.15.4"
   },
   "scripts": {
-    "test": "mocha -R travis-cov"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
