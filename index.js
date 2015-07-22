@@ -16,6 +16,8 @@ function ProtractorIstanbulPlugin() {
         functions: []
     };
 
+    instance.name = 'protractor-istanbul-plugin';
+
     instance.setup = function (options) {
         instance.options = merge(instance.options, options);
 

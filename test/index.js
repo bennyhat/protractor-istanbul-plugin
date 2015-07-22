@@ -31,6 +31,10 @@ describe('protractor-istanbul-plugin', function () {
             assert.equal(subject.postTest instanceof Function, true);
             done();
         });
+        it('should define a name via the name property', function (done) {
+            assert.notEqual(subject.name, undefined);
+            done();
+        });
     });
     describe('#setup', function () {
         describe('with valid options', function () {
