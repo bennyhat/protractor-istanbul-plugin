@@ -245,10 +245,10 @@ describe('protractor-istanbul-plugin', function () {
                                     sinon.assert.calledWithMatch(console.log, /Failed.*?gather.*?coverage.*?whonko\.json/);
                                     done();
                                 });
-                                it('returns a results object with 1 failed test and no spec results', function (done) {
+                                it('returns a results object with 0 failed test and no spec results', function (done) {
                                     assert.equal(typeof result == 'object', true);
                                     assert.equal(typeof result.failedCount == 'number', true);
-                                    assert.equal(result.failedCount, 1);
+                                    assert.equal(result.failedCount, 0);
                                     assert.equal(result.specResults instanceof Array, true);
                                     assert.deepEqual(result.specResults, []);
                                     done();
@@ -275,10 +275,10 @@ describe('protractor-istanbul-plugin', function () {
                                     sinon.assert.calledWithMatch(console.log, /Failed.*?gather.*?coverage.*?whonko\.json/);
                                     done();
                                 });
-                                it('returns a results object with 1 failed test and no spec results', function (done) {
+                                it('returns a results object with 0 failed test and no spec results', function (done) {
                                     assert.equal(typeof result == 'object', true);
                                     assert.equal(typeof result.failedCount == 'number', true);
-                                    assert.equal(result.failedCount, 1);
+                                    assert.equal(result.failedCount, 0);
                                     assert.equal(result.specResults instanceof Array, true);
                                     assert.deepEqual(result.specResults, []);
                                     done();

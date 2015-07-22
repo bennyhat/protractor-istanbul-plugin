@@ -6,7 +6,6 @@ var path = require('path');
 
 var ArgumentError = require('./lib/error').ArgumentError;
 var successfulPostTestOutput = {failedCount: 0, specResults: []};
-var failedPostTestOutput = {failedCount: 1, specResults: []};
 
 module.exports = new ProtractorIstanbulPlugin();
 
@@ -100,14 +99,14 @@ function ProtractorIstanbulPlugin() {
                 }
                 catch (error) {
                     console.log(failureMessage);
-                    deferred.resolve(failedPostTestOutput);
+                    deferred.resolve(successfulPostTestOutput);
                 }
                 console.log(successMessage);
                 deferred.resolve(successfulPostTestOutput);
             },
             function (error) {
                 console.log(failureMessage);
-                deferred.resolve(failedPostTestOutput);
+                deferred.resolve(successfulPostTestOutput);
             });
 
         return deferred.promise;
