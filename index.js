@@ -17,6 +17,15 @@ function ProtractorIstanbulPlugin() {
         enabled: true
     };
 
+    instance.teardownOutput = {
+        failedCount: 0,
+        specResults: [{
+            description: 'Coverage gathering errors and/or warnings',
+            assertions: [],
+            duration: 0
+        }]
+    };
+
     instance.name = 'protractor-istanbul-plugin';
 
     instance.setup = function (options) {
@@ -63,8 +72,7 @@ function ProtractorIstanbulPlugin() {
         var originalReturn = undefined;
         var deferred = Q.defer();
 
-        var successMessage = 'Successfully preserved coverage during wrapped function call';
-        var failureMessage = 'Failed to preserve coverage during wrapped function call';
+        var failureMessage = 'Warning: failed to preserve coverage during wrapped function call';
 
         instance.driver.executeScript('return __coverage__;')
             .then(
@@ -73,7 +81,7 @@ function ProtractorIstanbulPlugin() {
                     originalReturn = originalFunction.apply(this, originalArguments);
                 }
                 catch (error) {
-                    console.log(failureMessage);
+                    instance.teardownOutput.specResults[0].assertions.push({passed: true, errorMsg: failureMessage});
                     deferred.resolve(originalReturn);
                 }
                 instance.driver.executeScript('__coverage__ = arguments[0];', coverageObject).then(
@@ -81,13 +89,13 @@ function ProtractorIstanbulPlugin() {
                         deferred.resolve(originalReturn);
                     },
                     function () {
-                        console.log(failureMessage);
+                        instance.teardownOutput.specResults[0].assertions.push({passed: true, errorMsg: failureMessage});
                         deferred.resolve(originalReturn);
                     }
                 );
             },
             function () {
-                console.log(failureMessage);
+                instance.teardownOutput.specResults[0].assertions.push({passed: true, errorMsg: failureMessage});
                 originalReturn = originalFunction.apply(this, originalArguments);
                 deferred.resolve(originalReturn);
             });

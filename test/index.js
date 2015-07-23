@@ -134,8 +134,8 @@ describe('protractor-istanbul-plugin', function () {
                                     assert.equal(result, 'expected-result');
                                     done();
                                 });
-                                it('logs a failure message vaguely indicating that it failed to preserve coverage', function (done) {
-                                    sinon.assert.calledWithMatch(console.log, /Failed.*?preserve.*?coverage/);
+                                it('stores a resultsObject assertion warning that coverage preservation failed', function (done) {
+                                    assert.equal(/Warning:.*?failed.*?preserve/.test(subject.teardownOutput.specResults[0].assertions[0].errorMsg),true);
                                     done();
                                 });
                                 afterEach(function (done) {
@@ -157,8 +157,8 @@ describe('protractor-istanbul-plugin', function () {
                                         }
                                     ); // a lack of reject path here implies (unfortunately) that this should NOT reject
                                 });
-                                it('logs a failure message vaguely indicating that it failed to preserve coverage', function (done) {
-                                    sinon.assert.calledWithMatch(console.log, /Failed.*?preserve.*?coverage/);
+                                it('stores a resultsObject assertion warning that coverage preservation failed', function (done) {
+                                    assert.equal(/Warning:.*?failed.*?preserve/.test(subject.teardownOutput.specResults[0].assertions[0].errorMsg),true);
                                     done();
                                 });
                                 afterEach(function (done) {
@@ -186,8 +186,8 @@ describe('protractor-istanbul-plugin', function () {
                                     assert.equal(result, 'expected-result');
                                     done();
                                 });
-                                it('logs a failure message vaguely indicating that it failed to preserve coverage', function (done) {
-                                    sinon.assert.calledWithMatch(console.log, /Failed.*?preserve.*?coverage/);
+                                it('stores a resultsObject assertion warning that coverage preservation failed', function (done) {
+                                    assert.equal(/Warning:.*?failed.*?preserve/.test(subject.teardownOutput.specResults[0].assertions[0].errorMsg),true);
                                     done();
                                 });
                                 afterEach(function (done) {
