@@ -31,6 +31,10 @@ describe('protractor-istanbul-plugin', function () {
             assert.equal(subject.postTest instanceof Function, true);
             done();
         });
+        it('should implement the teardown plugin function', function (done) {
+            assert.equal(subject.teardown instanceof Function, true);
+            done();
+        });
         it('should define a name via the name property', function (done) {
             assert.notEqual(subject.name, undefined);
             done();
@@ -52,6 +56,10 @@ describe('protractor-istanbul-plugin', function () {
                 });
                 it('should set its preserveCoverage function to undefined', function (done) {
                     assert.equal(subject.preserveCoverage, undefined);
+                    done();
+                });
+                it('should set its teardown function to undefined', function (done) {
+                    assert.equal(subject.teardown, undefined);
                     done();
                 });
                 it('should not wrap the passed in function', function (done) {
@@ -289,6 +297,20 @@ describe('protractor-istanbul-plugin', function () {
                             console.log.restore();
                             done();
                         });
+                    });
+                });
+                describe('#teardown', function () {
+                    beforeEach(function (done) {
+                        result = undefined;
+                        var promised = subject.teardown();
+                        promised.then(function (output) {
+                            result = output;
+                            done();
+                        });
+                    });
+                    it('should just return whatever it has set in its teardownOutput object, which has been verified to update correctly in other tests', function (done) {
+                        assert.equal(result, subject.teardownOutput);
+                        done();
                     });
                 });
                 afterEach(function (done) {

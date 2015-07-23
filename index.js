@@ -35,6 +35,7 @@ function ProtractorIstanbulPlugin() {
         if (!instance.options.enabled) {
             delete instance.postTest;
             delete instance.preserveCoverage;
+            delete instance.teardown;
             return;
         }
 
@@ -127,4 +128,7 @@ function ProtractorIstanbulPlugin() {
 
         return deferred.promise;
     };
+    instance.teardown = function () {
+        return Q.resolve(instance.teardownOutput);
+    }
 }
