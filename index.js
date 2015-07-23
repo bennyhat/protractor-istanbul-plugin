@@ -20,7 +20,7 @@ function ProtractorIstanbulPlugin() {
     instance.teardownOutput = {
         failedCount: 0,
         specResults: [{
-            description: 'Coverage gathering errors and/or warnings',
+            description: 'Coverage gathering',
             assertions: [],
             duration: 0
         }]
@@ -122,7 +122,7 @@ function ProtractorIstanbulPlugin() {
                 deferred.resolve();
             },
             function (error) {
-                instance.teardownOutput.specResults[0].assertions.push({passed: true, errorMsg: gatherFailureMessage});
+                instance.teardownOutput.specResults[0].assertions.push({passed: false, errorMsg: gatherFailureMessage});
                 deferred.resolve();
             });
 
