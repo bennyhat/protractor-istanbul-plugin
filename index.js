@@ -5,7 +5,6 @@ var uuid = require('uuid');
 var path = require('path');
 
 var ArgumentError = require('./lib/error').ArgumentError;
-var successfulPostTestOutput = {failedCount: 0, specResults: []};
 
 module.exports = new ProtractorIstanbulPlugin();
 
@@ -82,7 +81,7 @@ function ProtractorIstanbulPlugin() {
                     originalReturn = originalFunction.apply(this, originalArguments);
                 }
                 catch (error) {
-                    instance.teardownOutput.specResults[0].assertions.push({passed: true, errorMsg: failureMessage});
+                    instance.logAssertion(failureMessage);
                     deferred.resolve(originalReturn);
                 }
                 instance.driver.executeScript('__coverage__ = arguments[0];', coverageObject).then(
@@ -90,13 +89,13 @@ function ProtractorIstanbulPlugin() {
                         deferred.resolve(originalReturn);
                     },
                     function () {
-                        instance.teardownOutput.specResults[0].assertions.push({passed: true, errorMsg: failureMessage});
+                        instance.logAssertion(failureMessage);
                         deferred.resolve(originalReturn);
                     }
                 );
             },
             function () {
-                instance.teardownOutput.specResults[0].assertions.push({passed: true, errorMsg: failureMessage});
+                instance.logAssertion(failureMessage);
                 originalReturn = originalFunction.apply(this, originalArguments);
                 deferred.resolve(originalReturn);
             });
@@ -116,13 +115,14 @@ function ProtractorIstanbulPlugin() {
                     instance.fs.outputJsonSync(outputFilePath, coverageObject);
                 }
                 catch (error) {
-                    instance.teardownOutput.specResults[0].assertions.push({passed: true, errorMsg: writeFailureMessage});
+                    instance.logAssertion(writeFailureMessage);
+                    instance.teardownOutput.failedCount++;
                     deferred.resolve();
                 }
                 deferred.resolve();
             },
-            function (error) {
-                instance.teardownOutput.specResults[0].assertions.push({passed: false, errorMsg: gatherFailureMessage});
+            function () {
+                instance.logAssertion(gatherFailureMessage);
                 deferred.resolve();
             });
 
@@ -130,5 +130,11 @@ function ProtractorIstanbulPlugin() {
     };
     instance.teardown = function () {
         return Q.resolve(instance.teardownOutput);
+    }
+
+    instance.logAssertion = function (message) {
+        if (instance.options.logAssertions) {
+            instance.teardownOutput.specResults[0].assertions.push({passed: false, errorMsg: message});
+        }
     }
 }

@@ -67,13 +67,32 @@ describe('protractor-istanbul-plugin', function () {
                     done();
                 });
             });
+            describe('with logAssertions option provided and set to false and failing call made', function () {
+                beforeEach(function (done) {
+                    subject.setup({
+                        logAssertions: false
+                    });
+                    subject.logAssertion("whatever");
+                    result = undefined;
+                    var promised = subject.teardown();
+                    promised.then(function (output) {
+                        result = output;
+                        done();
+                    });
+                });
+                it('teardown call should produce no assertions', function (done) {
+                    assert.deepEqual(result.specResults[0].assertions, []);
+                    done();
+                });
+            });
             describe('with all options provided', function () {
                 beforeEach(function (done) {
                     sinon.spy(expectedWrappedObject, 'expectedWrappedFunction');
                     subject.setup({
                         outputPath: "some/path",
                         functions: [expectedWrappedObject.expectedWrappedFunction],
-                        enabled: true
+                        enabled: true,
+                        logAssertions: true
                     });
                     // this will be implicitly available via protractor
                     subject.driver = {
@@ -283,6 +302,10 @@ describe('protractor-istanbul-plugin', function () {
                                 });
                                 it('stores a resultsObject assertion error that coverage gathering failed', function (done) {
                                     assert.equal(/Error:.*?failed.*?writ.*?coverage/.test(subject.teardownOutput.specResults[0].assertions[0].errorMsg), true);
+                                    done();
+                                });
+                                it('it increments the failed count on the resultsObject for the plugin', function (done) {
+                                    assert.equal(subject.teardownOutput.failedCount, 1);
                                     done();
                                 });
                                 afterEach(function (done) {
