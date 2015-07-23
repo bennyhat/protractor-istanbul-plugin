@@ -13,13 +13,21 @@ function ProtractorIstanbulPlugin() {
     var instance = this;
     instance.options = {
         outputPath: "coverage",
-        functions: []
+        functions: [],
+        enabled: true
     };
 
     instance.name = 'protractor-istanbul-plugin';
 
     instance.setup = function (options) {
         instance.options = merge(instance.options, options);
+
+        if (typeof instance.options.enabled !== 'boolean') throw new ArgumentError("");
+        if (!instance.options.enabled) {
+            delete instance.postTest;
+            delete instance.preserveCoverage;
+            return;
+        }
 
         // TODO - this is pretty jank
         instance.driver = undefined;

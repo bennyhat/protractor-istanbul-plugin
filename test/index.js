@@ -38,12 +38,34 @@ describe('protractor-istanbul-plugin', function () {
     });
     describe('#setup', function () {
         describe('with valid options', function () {
+            describe('with enable option provided and set to false', function () {
+                beforeEach(function (done) {
+                    subject.setup({
+                        functions: [expectedWrappedObject.expectedWrappedFunction],
+                        enabled: false
+                    });
+                    done();
+                });
+                it('should set its postTest function to undefined', function (done) {
+                    assert.equal(subject.postTest, undefined);
+                    done();
+                });
+                it('should set its preserveCoverage function to undefined', function (done) {
+                    assert.equal(subject.preserveCoverage, undefined);
+                    done();
+                });
+                it('should not wrap the passed in function', function (done) {
+                    assert.equal(expectedWrappedObject.expectedWrappedFunction, expectedWrappedFunction);
+                    done();
+                });
+            });
             describe('with all options provided', function () {
                 beforeEach(function (done) {
                     sinon.spy(expectedWrappedObject, 'expectedWrappedFunction');
                     subject.setup({
                         outputPath: "some/path",
-                        functions: [expectedWrappedObject.expectedWrappedFunction]
+                        functions: [expectedWrappedObject.expectedWrappedFunction],
+                        enabled: true
                     });
                     // this will be implicitly available via protractor
                     subject.driver = {
@@ -310,6 +332,14 @@ describe('protractor-istanbul-plugin', function () {
             });
         });
         describe('with invalid options', function () {
+            describe('with invalid enabled option', function () {
+                it('throws an exception stating that enabled is invalid', function (done) {
+                    chai.expect(function () {
+                        subject.setup({enabled: undefined});
+                    }).to.throw('ArgumentError');
+                    done();
+                })
+            });
             describe('with invalid outputPath option', function () {
                 it('throws an exception stating that outputPath is invalid', function (done) {
                     chai.expect(function () {
