@@ -115,8 +115,7 @@ function ProtractorIstanbulPlugin() {
                     instance.fs.outputJsonSync(outputFilePath, coverageObject);
                 }
                 catch (error) {
-                    instance.logAssertion(writeFailureMessage);
-                    instance.teardownOutput.failedCount++;
+                    instance.logAssertion(writeFailureMessage, true);
                     deferred.resolve();
                 }
                 deferred.resolve();
@@ -132,9 +131,12 @@ function ProtractorIstanbulPlugin() {
         return Q.resolve(instance.teardownOutput);
     }
 
-    instance.logAssertion = function (message) {
+    instance.logAssertion = function (message, shouldFail) {
         if (instance.options.logAssertions) {
             instance.teardownOutput.specResults[0].assertions.push({passed: false, errorMsg: message});
+        }
+        if (instance.options.failAssertions || shouldFail) {
+            instance.teardownOutput.failedCount++;
         }
     }
 }

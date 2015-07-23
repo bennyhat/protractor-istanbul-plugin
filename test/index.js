@@ -85,6 +85,24 @@ describe('protractor-istanbul-plugin', function () {
                     done();
                 });
             });
+            describe('with failAssertions option provided and set to true and failing call made', function () {
+                beforeEach(function (done) {
+                    subject.setup({
+                        failAssertions: true
+                    });
+                    subject.logAssertion("whatever");
+                    result = undefined;
+                    var promised = subject.teardown();
+                    promised.then(function (output) {
+                        result = output;
+                        done();
+                    });
+                });
+                it('teardown call should produce a failure', function (done) {
+                    assert.deepEqual(result.failedCount, 1);
+                    done();
+                });
+            });
             describe('with all options provided', function () {
                 beforeEach(function (done) {
                     sinon.spy(expectedWrappedObject, 'expectedWrappedFunction');
@@ -92,7 +110,8 @@ describe('protractor-istanbul-plugin', function () {
                         outputPath: "some/path",
                         functions: [expectedWrappedObject.expectedWrappedFunction],
                         enabled: true,
-                        logAssertions: true
+                        logAssertions: true,
+                        failAssertions: false
                     });
                     // this will be implicitly available via protractor
                     subject.driver = {
