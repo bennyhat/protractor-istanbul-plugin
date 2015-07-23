@@ -78,7 +78,6 @@ function ProtractorIstanbulPlugin() {
                 }
                 instance.driver.executeScript('__coverage__ = arguments[0];', coverageObject).then(
                     function () {
-                        console.log(successMessage);
                         deferred.resolve(originalReturn);
                     },
                     function () {

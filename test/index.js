@@ -38,7 +38,7 @@ describe('protractor-istanbul-plugin', function () {
     });
     describe('#setup', function () {
         describe('with valid options', function () {
-            describe('with enable option provided and set to false', function () {
+            describe('with enabled option provided and set to false', function () {
                 beforeEach(function (done) {
                     subject.setup({
                         functions: [expectedWrappedObject.expectedWrappedFunction],
@@ -108,10 +108,6 @@ describe('protractor-istanbul-plugin', function () {
                             });
                             it('preserves coverage by setting it back to the page with its driver', function (done) {
                                 sinon.assert.calledWith(subject.driver.executeScript, '__coverage__ = arguments[0];', {coverage: 'object'});
-                                done();
-                            });
-                            it('logs a success message vaguely indicating that it was successful and where it stored things', function (done) {
-                                sinon.assert.calledWithMatch(console.log, /Successfully.*?preserved.*?coverage/);
                                 done();
                             });
                             afterEach(function (done) {
