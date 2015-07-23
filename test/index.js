@@ -135,7 +135,7 @@ describe('protractor-istanbul-plugin', function () {
                                     done();
                                 });
                                 it('stores a resultsObject assertion warning that coverage preservation failed', function (done) {
-                                    assert.equal(/Warning:.*?failed.*?preserve/.test(subject.teardownOutput.specResults[0].assertions[0].errorMsg),true);
+                                    assert.equal(/Warning:.*?failed.*?preserve/.test(subject.teardownOutput.specResults[0].assertions[0].errorMsg), true);
                                     done();
                                 });
                                 afterEach(function (done) {
@@ -158,7 +158,7 @@ describe('protractor-istanbul-plugin', function () {
                                     ); // a lack of reject path here implies (unfortunately) that this should NOT reject
                                 });
                                 it('stores a resultsObject assertion warning that coverage preservation failed', function (done) {
-                                    assert.equal(/Warning:.*?failed.*?preserve/.test(subject.teardownOutput.specResults[0].assertions[0].errorMsg),true);
+                                    assert.equal(/Warning:.*?failed.*?preserve/.test(subject.teardownOutput.specResults[0].assertions[0].errorMsg), true);
                                     done();
                                 });
                                 afterEach(function (done) {
@@ -187,7 +187,7 @@ describe('protractor-istanbul-plugin', function () {
                                     done();
                                 });
                                 it('stores a resultsObject assertion warning that coverage preservation failed', function (done) {
-                                    assert.equal(/Warning:.*?failed.*?preserve/.test(subject.teardownOutput.specResults[0].assertions[0].errorMsg),true);
+                                    assert.equal(/Warning:.*?failed.*?preserve/.test(subject.teardownOutput.specResults[0].assertions[0].errorMsg), true);
                                     done();
                                 });
                                 afterEach(function (done) {
@@ -228,18 +228,6 @@ describe('protractor-istanbul-plugin', function () {
                                 sinon.assert.calledWith(subject.fs.outputJsonSync, expectedPath, {coverage: 'object'});
                                 done();
                             });
-                            it('logs a success message vaguely indicating that it was successful and where it stored things', function (done) {
-                                sinon.assert.calledWithMatch(console.log, /Successfully.*?gathered.*?coverage.*?whonko\.json/);
-                                done();
-                            });
-                            it('returns a results object with 0 failed tests and no spec results', function (done) {
-                                assert.equal(typeof result == 'object', true);
-                                assert.equal(typeof result.failedCount == 'number', true);
-                                assert.equal(result.failedCount, 0);
-                                assert.equal(result.specResults instanceof Array, true);
-                                assert.deepEqual(result.specResults, []);
-                                done();
-                            });
                             afterEach(function (done) {
                                 subject.driver.executeScript.restore();
                                 subject.fs.outputJsonSync.restore();
@@ -263,16 +251,8 @@ describe('protractor-istanbul-plugin', function () {
                                     sinon.assert.neverCalledWith(subject.fs.outputJsonSync);
                                     done();
                                 });
-                                it('logs a failure message vaguely indicating that it was failed and where it tried to store things', function (done) {
-                                    sinon.assert.calledWithMatch(console.log, /Failed.*?gather.*?coverage.*?whonko\.json/);
-                                    done();
-                                });
-                                it('returns a results object with 0 failed test and no spec results', function (done) {
-                                    assert.equal(typeof result == 'object', true);
-                                    assert.equal(typeof result.failedCount == 'number', true);
-                                    assert.equal(result.failedCount, 0);
-                                    assert.equal(result.specResults instanceof Array, true);
-                                    assert.deepEqual(result.specResults, []);
+                                it('stores a resultsObject assertion warning that coverage gathering failed', function (done) {
+                                    assert.equal(/Warning:.*?failed.*?gather.*?coverage/.test(subject.teardownOutput.specResults[0].assertions[0].errorMsg), true);
                                     done();
                                 });
                                 afterEach(function (done) {
@@ -293,16 +273,8 @@ describe('protractor-istanbul-plugin', function () {
                                         }
                                     ); // a lack of reject path here implies (unfortunately) that this should NOT reject
                                 });
-                                it('logs a failure message vaguely indicating that it was failed and where it tried to store things', function (done) {
-                                    sinon.assert.calledWithMatch(console.log, /Failed.*?gather.*?coverage.*?whonko\.json/);
-                                    done();
-                                });
-                                it('returns a results object with 0 failed test and no spec results', function (done) {
-                                    assert.equal(typeof result == 'object', true);
-                                    assert.equal(typeof result.failedCount == 'number', true);
-                                    assert.equal(result.failedCount, 0);
-                                    assert.equal(result.specResults instanceof Array, true);
-                                    assert.deepEqual(result.specResults, []);
+                                it('stores a resultsObject assertion error that coverage gathering failed', function (done) {
+                                    assert.equal(/Error:.*?failed.*?writ.*?coverage/.test(subject.teardownOutput.specResults[0].assertions[0].errorMsg), true);
                                     done();
                                 });
                                 afterEach(function (done) {

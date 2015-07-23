@@ -105,8 +105,8 @@ function ProtractorIstanbulPlugin() {
     instance.postTest = function () {
         var deferred = Q.defer();
         var outputFilePath = path.join(instance.options.outputPath, uuid.v4() + '.json');
-        var successMessage = 'Successfully gathered coverage for test and stored in ' + outputFilePath;
-        var failureMessage = 'Failed to gather coverage for test and store in ' + outputFilePath;
+        var gatherFailureMessage = 'Warning: failed to gather coverage for test';
+        var writeFailureMessage = 'Error: failed to write coverage for test to ' + outputFilePath;
 
         instance.driver.executeScript('return __coverage__;')
             .then(
@@ -115,15 +115,14 @@ function ProtractorIstanbulPlugin() {
                     instance.fs.outputJsonSync(outputFilePath, coverageObject);
                 }
                 catch (error) {
-                    console.log(failureMessage);
-                    deferred.resolve(successfulPostTestOutput);
+                    instance.teardownOutput.specResults[0].assertions.push({passed: true, errorMsg: writeFailureMessage});
+                    deferred.resolve();
                 }
-                console.log(successMessage);
-                deferred.resolve(successfulPostTestOutput);
+                deferred.resolve();
             },
             function (error) {
-                console.log(failureMessage);
-                deferred.resolve(successfulPostTestOutput);
+                instance.teardownOutput.specResults[0].assertions.push({passed: true, errorMsg: gatherFailureMessage});
+                deferred.resolve();
             });
 
         return deferred.promise;
