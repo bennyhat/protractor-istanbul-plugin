@@ -10,6 +10,7 @@ module.exports = new ProtractorIstanbulPlugin();
 
 function ProtractorIstanbulPlugin() {
     var instance = this;
+    instance.config = {};
     instance.options = {
         outputPath: "coverage",
         functions: [],
@@ -27,8 +28,8 @@ function ProtractorIstanbulPlugin() {
 
     instance.name = 'protractor-istanbul-plugin';
 
-    instance.setup = function (options) {
-        instance.options = merge(instance.options, options);
+    instance.setup = function () {
+        instance.options = merge(instance.options, instance.config);
 
         if (typeof instance.options.enabled !== 'boolean') throw new ArgumentError("");
         if (!instance.options.enabled) {
