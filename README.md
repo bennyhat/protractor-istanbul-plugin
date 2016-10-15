@@ -1,3 +1,8 @@
+# abandoned
+Many apologies. I don't have time to keep up with the questions and issues I get on this. Most of them are meritted, as integration testing setups all vary wildly. However, this, paired with the limited time on my part, the fact that protractor's plugin API changes rapidly, and other factors, means I can't really keep this thing going.
+
+Please fork if desired. If you'd like to take-over the NPM module, please let me know. Thanks, Ben
+
 # protractor-istanbul-plugin
 [![Build Status](https://travis-ci.org/bennyhat/protractor-istanbul-plugin.svg)](https://travis-ci.org/bennyhat/protractor-istanbul-plugin) [![Coverage Status](https://coveralls.io/repos/bennyhat/protractor-istanbul-plugin/badge.svg?branch=master&service=github)](https://coveralls.io/github/bennyhat/protractor-istanbul-plugin?branch=master)
 
